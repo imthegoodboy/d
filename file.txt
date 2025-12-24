@@ -1,0 +1,481 @@
+-- Experiment 1: 4-variable logic expression (simplified to AB + CD)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity p1 is
+    Port ( a : in  STD_LOGIC;
+           b : in  STD_LOGIC;
+           c : in  STD_LOGIC;
+           d : in  STD_LOGIC;
+           y : out  STD_LOGIC);
+end p1;
+
+architecture Behavioral of p1 is
+begin
+    y <= (a and b) or (c and d);
+end Behavioral;
+
+-- Experiment 2: Full Adder (used for 3-bit adder with basic gates)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity fullAdder is
+    Port ( a : in STD_LOGIC;
+           b : in STD_LOGIC;
+           c : in STD_LOGIC;
+           sum : out STD_LOGIC;
+           carry : out STD_LOGIC);
+end fullAdder;
+
+architecture Behavioral of fullAdder is
+begin
+    sum <= a xor b xor c;
+    carry <= (a and b) or (b and c) or (c and a);
+end Behavioral;
+
+-- Experiment 2: Full Subtractor (used for 3-bit subtractor with basic gates)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity fullsub is
+    Port ( a : in STD_LOGIC;
+           b : in STD_LOGIC;
+           c : in STD_LOGIC;
+           diff : out STD_LOGIC;
+           borr : out STD_LOGIC);
+end fullsub;
+
+architecture Behavioral of fullsub is
+begin
+    diff <= a xor b xor c;
+    borr <= (not a and b) or (not a and c) or (b and c);
+end Behavioral;
+
+-- Experiment 3: Behavioral model for simple circuit (Y = not (A and B and C))
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity Vbe is
+    Port ( A : in STD_LOGIC;
+           B : in STD_LOGIC;
+           C : in STD_LOGIC;
+           Y : out STD_LOGIC);
+end Vbe;
+
+architecture Behavioral of Vbe is
+begin
+    process(A,B,C)
+    begin
+        if (C='0') then Y<='1';
+        elsif (A='1' and B='1') then Y<='0';
+        else Y<='1';
+        end if;
+    end process;
+end Behavioral;
+
+-- Experiment 3: Dataflow model for simple circuit
+entity Vbe is
+    Port ( A : in STD_LOGIC;
+           B : in STD_LOGIC;
+           C : in STD_LOGIC;
+           Y : out STD_LOGIC);
+end Vbe;
+
+architecture dataflow of Vbe is
+    signal X: STD_LOGIC;
+    signal N: STD_LOGIC;
+    signal Z: STD_LOGIC;
+begin
+    X <= A and B;
+    N <= not C;
+    Z <= x and N;
+    Y <= not Z;
+end dataflow;
+
+-- Experiment 3: Structural model for simple circuit
+entity Vbe is
+    Port ( A : in STD_LOGIC;
+           B : in STD_LOGIC;
+           C : in STD_LOGIC;
+           Y : out STD_LOGIC);
+end Vbe;
+
+architecture structure of Vbe is
+    component notgate
+        Port ( A : in STD_LOGIC;
+               B : out STD_LOGIC);
+    end component;
+
+    component andgate
+        Port ( A : in STD_LOGIC;
+               B : in STD_LOGIC;
+               C: out STD_LOGIC);
+    end component;
+
+    component orgate
+        Port ( A : in STD_LOGIC;
+               B : in STD_LOGIC;
+               C: out STD_LOGIC);
+    end component;
+
+    signal X:STD_LOGIC;
+    signal N:STD_LOGIC;
+    signal Z:STD_LOGIC;
+begin
+    and1: andgate port map( A,B,X);
+    not1: notgate port map(C,N);
+    or1: orgate port map( X,N,Z);
+    nor2: norgate port map(Z,Y); -- Note: norgate component not defined in manual, likely a notgate or nor component
+end structure;
+
+-- Experiment 3: Not gate component (used in structural)
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity notgate is
+    Port ( A : in STD_LOGIC;
+           B : out STD_LOGIC);
+end notgate;
+
+architecture Behavioral of notgate is
+begin
+    B <= not A;
+end Behavioral;
+
+-- Experiment 4: Half Adder
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity half1 is
+    Port ( a : in STD_LOGIC;
+           b : in STD_LOGIC;
+           sum : out STD_LOGIC;
+           carry : out STD_LOGIC);
+end half1;
+
+architecture Behavioral of half1 is
+begin
+    sum <= a xor b;
+    carry <= a and b;
+end Behavioral;
+
+-- Experiment 4: Half Subtractor
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity hsub is
+    Port ( a : in STD_LOGIC;
+           b : in STD_LOGIC;
+           diff : out STD_LOGIC;
+           borr : out STD_LOGIC);
+end hsub;
+
+architecture Behavioral of hsub is
+begin
+    diff <= a xor b;
+    borr <= (not a and b);
+end Behavioral;
+
+-- Experiment 5: Decimal (BCD) Adder
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity de1 is
+    Port ( x : in  STD_LOGIC_VECTOR (3 downto 0);
+           y : in  STD_LOGIC_VECTOR (3 downto 0);
+           S : out  STD_LOGIC_VECTOR (4 downto 0));
+end de1;
+
+architecture Behavioral of de1 is
+    Signal Adjust:STD_LOGIC;
+    Signal Sum:STD_LOGIC_VECTOR (4 downto 0);
+begin
+    Sum <= ('0'&x)+y;
+    Adjust <= '1' when ((Sum > 9) or Sum(4)='1') else '0';
+    S <= Sum when ( Adjust='0') else Sum+6;
+end Behavioral;
+
+-- Experiment 6: 2:1 Multiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity mux2 is
+    Port ( sel : in STD_LOGIC;
+           d : in STD_LOGIC_VECTOR (1 downto 0);
+           y : out STD_LOGIC);
+end mux2;
+
+architecture Behavioral of mux2 is
+begin
+    process(sel,d)
+    begin
+        case sel is
+            when '0' => y <= d(0);
+            when '1' => y <= d(1);
+            when others => y <= d(1);
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 6: 4:1 Multiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity mux4 is
+    Port ( sel : in STD_LOGIC_VECTOR (1 downto 0);
+           d : in STD_LOGIC_VECTOR (3 downto 0);
+           y : out STD_LOGIC);
+end mux4;
+
+architecture Behavioral of mux4 is
+begin
+    process(sel,d)
+    begin
+        case sel is
+            when "00" => y <= d(0);
+            when "01" => y <= d(1);
+            when "10" => y <= d(2);
+            when "11" => y <= d(3);
+            when others => y <= d(3);
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 6: 8:1 Multiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity mux1 is
+    Port ( sel : in STD_LOGIC_VECTOR (2 downto 0);
+           d : in STD_LOGIC_VECTOR (7 downto 0);
+           y : out STD_LOGIC);
+end mux1;
+
+architecture Behavioral of mux1 is
+begin
+    process(sel,d)
+    begin
+        case sel is
+            when "000" => y <= d(0);
+            when "001" => y <= d(1);
+            when "010" => y <= d(2);
+            when "011" => y <= d(3);
+            when "100" => y <= d(4);
+            when "101" => y <= d(5);
+            when "110" => y <= d(6);
+            when "111" => y <= d(7);
+            when others => y <= d(7);
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 7: 1:2 Demultiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity demux2 is
+    Port ( sel : in STD_LOGIC;
+           I : in STD_LOGIC;
+           y : out STD_LOGIC_VECTOR (1 downto 0));
+end demux2;
+
+architecture Behavioral of demux2 is
+begin
+    process(sel,I)
+    begin
+        case sel is
+            when '0' => y(0) <= I;
+            when '1' => y(1) <= I;
+            when others => y(1) <= I;
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 7: 1:4 Demultiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity demux4 is
+    Port ( sel : in STD_LOGIC_VECTOR (1 downto 0);
+           I : in STD_LOGIC;
+           y : out STD_LOGIC_VECTOR (3 downto 0));
+end demux4;
+
+architecture Behavioral of demux4 is
+begin
+    process(sel,I)
+    begin
+        case sel is
+            when "00" => y(0) <= I;
+            when "01" => y(1) <= I;
+            when "10" => y(2) <= I;
+            when "11" => y(3) <= I;
+            when others => y(3) <= I;
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 7: 1:8 Demultiplexer
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity demux8 is
+    Port ( sel : in STD_LOGIC_VECTOR (2 downto 0);
+           I : in STD_LOGIC;
+           Y : out STD_LOGIC_VECTOR (7 downto 0));
+end demux8;
+
+architecture Behavioral of demux8 is
+begin
+    process(sel,I)
+    begin
+        case sel is
+            when "000" => y(0) <= I;
+            when "001" => y(1) <= I;
+            when "010" => y(2) <= I;
+            when "011" => y(3) <= I;
+            when "100" => y(4) <= I;
+            when "101" => y(5) <= I;
+            when "110" => y(6) <= I;
+            when "111" => y(7) <= I;
+            when others => y(7) <= I;
+        end case;
+    end process;
+end Behavioral;
+
+-- Experiment 8: SR Flip-Flop
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity sr1 is
+    Port ( clk : in STD_LOGIC;
+           r : in STD_LOGIC;
+           s : in STD_LOGIC;
+           q : out STD_LOGIC;
+           qn : out STD_LOGIC);
+end sr1;
+
+architecture Behavioral of sr1 is
+begin
+    process (CLK)
+    variable TEMP: STD_LOGIC := '0';
+    begin
+        if (CLK = '1') then
+            if (s = '0' and r = '0') then TEMP := TEMP;
+            elsif (s = '0' and r = '1') then TEMP := '0';
+            elsif (s = '1' and r = '0') then TEMP := '1';
+            end if;
+        end if;
+        q <= TEMP;
+        qn <= not TEMP;
+    end process;
+end Behavioral;
+
+-- Experiment 8: JK Flip-Flop
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity jkff1 is
+    Port ( j : in STD_LOGIC;
+           k : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           q : out STD_LOGIC;
+           qn : out STD_LOGIC);
+end jkff1;
+
+architecture Behavioral of jkff1 is
+begin
+    process (CLK)
+    variable TEMP: STD_LOGIC := '0';
+    begin
+        if (CLK = '1') then
+            if (J = '0' and K = '0') then TEMP := TEMP;
+            elsif (J = '1' and K = '1') then TEMP := not TEMP;
+            elsif (J = '0' and K = '1') then TEMP := '0';
+            else TEMP := '1';
+            end if;
+        end if;
+        q <= TEMP;
+        qn <= not TEMP;
+    end process;
+end Behavioral;
+
+-- Experiment 8: D Flip-Flop
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity dff1 is
+    Port ( d : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           q : inout STD_LOGIC;
+           qn : out STD_LOGIC);
+end dff1;
+
+architecture Behavioral of dff1 is
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            q <= d;
+            qn <= not q;
+        end if;
+    end process;
+end Behavioral;
+
+-- Extra (beyond syllabus): T Flip-Flop
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity tff1 is
+    Port ( clk : in STD_LOGIC;
+           t : in STD_LOGIC;
+           q : inout STD_LOGIC;
+           qn : out STD_LOGIC);
+end tff1;
+
+architecture Behavioral of tff1 is
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            q <= not t; -- Note: This appears to be an error in the manual; for correct T FF, it should toggle when t=1 (e.g., if t='1' then q <= not q; end if;)
+            qn <= not q;
+        end if;
+    end process;
+end Behavioral;
